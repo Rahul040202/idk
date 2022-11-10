@@ -1,0 +1,56 @@
+#SLP
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.activations import hard_sigmoid
+import matplotlib.pyplot as plt
+from keras.callbacks import History
+import pandas as pd
+import numpy as np
+history=History()
+
+
+if __name__ == "__main__":
+    # Load the Pima diabetes dataset from CSV
+    # and convert into a NumPy matrix suitable for
+    # extraction into X, y format needed for TensorFlow
+    diabetes = pd.read_csv('/home/user/Downloads/diabetes.csv').values
+
+    # Extract the feature columns and outcome response
+    # into appropriate variables
+    X = diabetes[:, 0:8].astype(np.float32)
+    y = diabetes[:, 8].astype(np.float32)
+
+    # Create the 'Perceptron' using the Keras API
+    model = Sequential()
+    model.add(Dense(1, input_shape=(8,), activation=hard_sigmoid, kernel_initializer='glorot_uniform'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    # Train the perceptron using stochastic gradient descent
+    # with a validation split of 20%
+    history=model.fit(X, y, epochs=500, batch_size=25, verbose=1, validation_split=0.2)
+    acc_train = history.history['accuracy']
+
+    acc_val = history.history['val_accuracy']
+
+    epochs = range(0,500)
+
+    plt.plot(epochs, acc_train, 'g', label='Training accuracy')
+
+    plt.plot(epochs, acc_val, 'b', label='Validation accuracy')
+
+    plt.title('Training and Validation accuracy')
+
+    plt.xlabel('Epochs')
+
+    plt.ylabel('Accuracy')
+
+    plt.legend()
+
+    plt.show()
+   
+
+
+    # Evaluate the model accuracy
+    _, accuracy = model.evaluate(X, y)
+    print("%0.3f" % accuracy)
